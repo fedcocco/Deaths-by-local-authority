@@ -1,0 +1,26 @@
+library(readr)
+library(dplyr)
+library(readxl)
+
+
+la_deaths <- read_xlsx(
+  "~/Downloads/weekly-deaths-local-authority-time-series-v13.xlsx",
+  sheet = "Dataset",
+  skip = 2)
+
+la_reduced <- la_deaths %>%
+  mutate(code_first = stringr::str_sub(`Geography code`, 1, 1)) %>%
+  group_by(
+    code_first,
+    Week,
+    CauseOfDeath,
+    PlaceOfDeath,
+    RegistrationOrOccurrence
+  ) %>%
+  summarise(
+    deaths = sum(`2020`)
+  ) %>%
+  ungroup()
+
+write_csv(la_reduced,
+          "~/Downloads/weekly_deaths_reduced.csv")
